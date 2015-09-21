@@ -96,8 +96,8 @@ defmodule EvercamMedia.SnapshotController do
       data = response.body
       check_jpg(data)
       broadcast_snapshot(camera_id, data)
-      response = store(camera_id, camera.id , data, "Evercam Proxy")
-
+      file_timestamp = Timex.Date.now(:secs)
+      response =  %{camera_id: camera_id, image: data, timestamp: file_timestamp, notes: "Evercam Proxy"}
       [200, response]
     rescue
       error in [FunctionClauseError] ->
