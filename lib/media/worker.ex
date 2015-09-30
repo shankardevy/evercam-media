@@ -9,14 +9,15 @@ defmodule EvercamMedia.Worker do
   end
 
   def init(args) do
-    Task.start_link(fn -> loop(args) end)
+    {:ok, args}
+  #  Task.start_link(fn -> loop(args) end)
   end
 
   defp loop(args) do
     :timer.sleep(args[:sleep] + args[:initial_sleep])
     args = Dict.put(args, :initial_sleep, 0)
     if scheduled?(args[:schedule], args[:timezone]) do
-      Task.start(fn -> check_camera(args) end)
+      Task.start_link(fn -> check_camera(args) end)
     end
     loop(args)
   end

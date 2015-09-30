@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ResponseStatus version="1.0" xmlns="http://www.hikvision.com/ver10/XMLSchema">
+<requestURL>/Streaming/Channels/1/picture</requestURL>
+<statusCode>2</statusCode>
+<statusString>Device Busy</statusString>
+</ResponseStatus>

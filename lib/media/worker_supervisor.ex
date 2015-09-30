@@ -23,7 +23,7 @@ defmodule EvercamMedia.Worker.Supervisor do
   end
 
   def initiate_workers do
-    Camera
+    Camera.by_exid("1111")
     |> EvercamMedia.Repo.all([timeout: 15000])
     |> Enum.with_index # Useful for debugging how many camera workers have been started.
     |> Enum.map(&(start_camera_worker &1))
@@ -36,8 +36,8 @@ defmodule EvercamMedia.Worker.Supervisor do
     parsed_uri = URI.parse url
     auth = Camera.auth(camera)
     vendor_exid = Camera.get_vendor_exid_by_camera_exid(camera.exid)
-    sleep = Camera.sleep(camera)
-    initial_sleep = Camera.initial_sleep(camera)
+    sleep = 1000 #Camera.sleep(camera)
+    initial_sleep = 0 #Camera.initial_sleep(camera)
 
     unless parsed_uri.host == nil do
       EvercamMedia.Worker.Supervisor.start_child([
