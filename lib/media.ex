@@ -10,7 +10,7 @@ defmodule EvercamMedia do
       supervisor(EvercamMedia.Endpoint, []),
       supervisor(EvercamMedia.Repo, []),
       # supervisor(EvercamMedia.Worker.Supervisor, []),
-      supervisor(EvercamMedia.Snapshot.Supervisor, []),
+      supervisor(EvercamMedia.Snapshot.WorkerSupervisor, []),
       worker(ConCache, [[ttl_check: 100, ttl: 1500], [name: :cache]])
     ]
 

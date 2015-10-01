@@ -36,6 +36,6 @@ defmodule EvercamMedia.Snapshot.CamClient do
   end
 
   defp parse_snapshot_response(error) do
-    error
+    {:error, error}
   end
 end

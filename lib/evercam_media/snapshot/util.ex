@@ -16,11 +16,8 @@ defmodule EvercamMedia.Snapshot.Util do
   """
 
   def is_jpeg(data) do
-    size_without_magic = byte_size(data) - 5
-    try do
-      <<0xFF,0xD8, data :: binary-size(size_without_magic), 0xFF, 0xD9, 0>> = data
-      true
-    rescue
+    case data do
+      <<0xFF,0xD8, data :: binary>> -> true
       _ -> false
     end
   end

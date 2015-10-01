@@ -6,121 +6,102 @@ defmodule EvercamMedia.Snapshot.Poller do
   """
 
   use GenServer
-  alias EvercamMedia.Snapshot.CamClient
+  alias EvercamMedia.Snapshot.Worker
 
-  ## Client API
+  ################
+  ## Client API ##
+  ################
+
   @doc """
-  Start the Snapshot server for a given camera.
-
+  Start a poller for camera worker.
   """
-  def start_link(camera, opts \\ []) do
-    GenServer.start_link(__MODULE__, opts)
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
   end
 
   @doc """
-  Get a snapshot from the camera server
-  """
-  def get_snapshot(cam_server) do
-    GenServer.call(cam_server, :get_camera_snapshot)
-  end
-
-  @doc """
-  Start a worker for the camera that takes snapshot in frequent interval
+  Restart the poller for the camera that takes snapshot in frequent interval
   as defined in the args passed to the camera server.
-
   """
-  def start_worker(cam_server) do
-    GenServer.call(cam_server, :start_camera_worker)
+  def start_timer(cam_server) do
+    GenServer.call(cam_server, :restart_camera_timer)
   end
 
   @doc """
-  Stop a worker for the camera.
+  Stop the poller for the camera.
   """
-  def stop_worker(cam_server) do
-    GenServer.call(cam_server, :stop_camera_worker)
+  def stop_timer(cam_server) do
+    GenServer.call(cam_server, :stop_camera_timer)
   end
 
   @doc """
-  Get the process id of the camera worker if there is a worker started o
-  """
-  def get_worker_pid(cam_server) do
-    GenServer.call(cam_server, :get_camera_worker)
-  end
-
-
-  @doc """
+  Get the configuration of the camera worker.
   """
   def get_config(cam_server) do
     GenServer.call(cam_server, :get_camera_config)
   end
 
   @doc """
+  Update the configuration of the camera worker
   """
   def update_config(cam_server, config) do
     GenServer.call(cam_server, {:update_camera_config, config})
   end
 
 
-  ## Server Callbacks
+  ######################
+  ## Server Callbacks ##
+  ######################
 
   @doc """
   Initialize the camera server
   """
   def init(args) do
-    state = %{config: args}
-    {:ok, state}
+    args = Map.merge args, %{
+      timer: start_timer(args.config.sleep, :poll)
+    }
+    {:ok, args}
   end
 
   @doc """
-  Server callback for getting snapshot
+  Server callback for restarting camera poller
   """
-  def handle_call(:get_camera_snapshot, _from, state) do
-    {:ok, config} = get_state(:config, state)
-
-    result = CamClient.fetch_snapshot(config)
-    {:reply, result, state}
-  end
-
-  @doc """
-  Server callback for starting camera worker
-  """
-  def handle_call(:start_camera_worker, _from, state) do
+  def handle_call(:restart_camera_timer, _from, state) do
     {:reply, nil, state}
   end
 
   @doc """
-  Server callback for stopping camera worker
+  Server callback for stopping camera poller
   """
-  def handle_call(:stop_camera_worker, _from, state) do
+  def handle_call(:stop_camera_timer, _from, state) do
     {:reply, nil, state}
   end
 
   @doc """
-  Server callback for getting camera worker
+  Server callback for polling
   """
-  def handle_call(:get_camera_worker, _from, state) do
-    {:reply, nil, state}
+  def handle_info(:poll, state) do
+    {:ok, timer} = Map.fetch(state, :timer)
+    :erlang.cancel_timer(timer)
+    timestamp = Calendar.DateTime.now!("UTC") |> Calendar.DateTime.Format.unix
+    Worker.get_snapshot(state.name, {:poll, timestamp})
+    timer = start_timer(state.config.sleep, :poll)
+    {:noreply, Map.put(state, :timer, timer)}
   end
 
   @doc """
-  Server callback for getting camera config
+  Take care of unknown messages which otherwise would trigger function clause mismatch error.
   """
-  def handle_call(:get_camera_config, _from, state) do
-    {:reply, get_state(:config, state), state}
+  def handle_info(_msg, state) do
+    {:noreply, state}
   end
 
-  @doc """
-  Server callback for updating camera config
-  """
-  def handle_call({:update_camera_config, config}, _from, state) do
-    {:reply, nil, state}
-  end
+  #######################
+  ## Private functions ##
+  #######################
 
-  @doc """
-  Gets camera config from the server state
-  """
-  defp get_state(:config, state) do
-    Map.fetch(state, :config)
+  defp start_timer(sleep, message) do
+    :erlang.send_after(sleep, self(), message)
   end
 
 end
