@@ -81,8 +81,8 @@ defmodule EvercamMedia.Snapshot.WorkerSupervisor do
         timezone: camera.timezone,
         url: url,
         auth: Camera.auth(camera),
-        sleep: 1000, #Camera.sleep(camera),
-        initial_sleep: 0 #Camera.initial_sleep(camera)
+        sleep: Camera.sleep(camera),
+        initial_sleep: Camera.initial_sleep(camera)
       }
     }
   end

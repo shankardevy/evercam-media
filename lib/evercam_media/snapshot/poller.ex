@@ -7,6 +7,7 @@ defmodule EvercamMedia.Snapshot.Poller do
 
   use GenServer
   alias EvercamMedia.Snapshot.Worker
+  import EvercamMedia.Schedule
 
   ################
   ## Client API ##
@@ -84,7 +85,9 @@ defmodule EvercamMedia.Snapshot.Poller do
     {:ok, timer} = Map.fetch(state, :timer)
     :erlang.cancel_timer(timer)
     timestamp = Calendar.DateTime.now!("UTC") |> Calendar.DateTime.Format.unix
-    Worker.get_snapshot(state.name, {:poll, timestamp})
+    if scheduled?(state.config.schedule, state.config.timezone) do
+      Worker.get_snapshot(state.name, {:poll, timestamp})
+    end    
     timer = start_timer(state.config.sleep, :poll)
     {:noreply, Map.put(state, :timer, timer)}
   end
