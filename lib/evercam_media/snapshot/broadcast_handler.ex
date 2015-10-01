@@ -2,7 +2,7 @@ defmodule EvercamMedia.Snapshot.BroadcastHandler do
   use GenEvent
 
   def handle_event({:got_snapshot, data}, state) do
-    {camera_exid, timestamp, image} = data
+    {camera_exid, _, image} = data
     EvercamMedia.Endpoint.broadcast(
       "cameras:#{camera_exid}",
       "snapshot-taken",

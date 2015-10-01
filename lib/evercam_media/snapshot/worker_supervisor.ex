@@ -13,6 +13,7 @@ defmodule EvercamMedia.Snapshot.WorkerSupervisor do
   """
 
   use Supervisor
+  require Logger
 
   @event_handlers [
     EvercamMedia.Snapshot.BroadcastHandler,
@@ -28,6 +29,9 @@ defmodule EvercamMedia.Snapshot.WorkerSupervisor do
   end
 
   def init(:ok) do
+    unless Application.get_env(:evercam_media, :skip_camera_workers) do
+      Task.start_link(&EvercamMedia.Snapshot.WorkerSupervisor.initiate_workers/0)
+    end
     children = [worker(EvercamMedia.Snapshot.Worker, [], restart: :transient)]
     supervise(children, strategy: :simple_one_for_one)
   end
@@ -40,9 +44,9 @@ defmodule EvercamMedia.Snapshot.WorkerSupervisor do
     parsed_uri = URI.parse url
 
     case parsed_uri.host do
-      nil -> IO.puts "Skipping camera worker as the host is invalid"
+      nil -> Logger.info "Skipping camera worker as the host is invalid"
       _   ->
-        IO.puts "Starting worker for #{camera.exid}"
+        Logger.info "Starting worker for #{camera.exid}"
         Supervisor.start_child(__MODULE__, [get_config(camera, url)])
     end
   end
@@ -54,7 +58,7 @@ defmodule EvercamMedia.Snapshot.WorkerSupervisor do
   is initiated.
   """
   def initiate_workers do
-    Camera#.by_exid("heidelberg_view")
+    Camera
     |> EvercamMedia.Repo.all([timeout: 15000])
     |> Enum.map(&(start_worker &1))
   end

@@ -17,14 +17,19 @@ defmodule EvercamMedia.Snapshot.DBHandler do
   use GenEvent
   require Logger
   alias EvercamMedia.Repo
+  alias EvercamMedia.S3
 
 
   def handle_event({:got_snapshot, data}, state) do
     {camera_exid, timestamp, image} = data
-    timestamp = Ecto.DateTime.utc
+    ecto_timestamp = Ecto.DateTime.utc
     spawn fn ->
-      update_camera_status("#{camera_exid}", timestamp, true)
-      |> save_snapshot_record(timestamp)
+      try do
+        update_camera_status("#{camera_exid}", ecto_timestamp, timestamp, true)
+        |> save_snapshot_record(ecto_timestamp)
+      rescue
+        error -> error_handler(error)
+      end
     end
     {:ok, state}
   end
@@ -33,30 +38,31 @@ defmodule EvercamMedia.Snapshot.DBHandler do
     {:ok, state}
   end
 
-  def update_camera_status(camera_exid, timestamp, status) do
+  def update_camera_status(camera_exid, ecto_timestamp, timestamp, status) do
     #TODO Improve the db queries here
     camera = Repo.one! Camera.by_exid(camera_exid)
     camera_is_online = camera.is_online
-    camera = construct_camera(camera, timestamp, status, camera_is_online == status)
+    camera = construct_camera(camera, ecto_timestamp, status, camera_is_online == status)
+    file_path = "/#{camera.exid}/snapshots/#{timestamp}.jpg"
+    camera = %{camera | thumbnail_url: S3.file_url(file_path)}
     Repo.update camera
-    #
-    # unless camera_is_online == status do
-    #   try do
-    #     log_camera_status(camera.id, status, timestamp)
-    #   rescue
-    #     _error ->
-    #       error_handler(_error)
-    #   end
-    #   Exq.Enqueuer.enqueue(
-    #     :exq_enqueuer,
-    #     "cache",
-    #     "Evercam::CacheInvalidationWorker",
-    #     camera_exid
-    #   )
-    # end
+
+    unless camera_is_online == status do
+      try do
+        log_camera_status(camera.id, status, timestamp)
+      rescue
+        _error ->
+          error_handler(_error)
+      end
+      Exq.Enqueuer.enqueue(
+        :exq_enqueuer,
+        "cache",
+        "Evercam::CacheInvalidationWorker",
+        camera_exid
+      )
+    end
     camera
   end
-
 
   def log_camera_status(camera_id, true, timestamp) do
     Repo.insert %CameraActivity{camera_id: camera_id, action: "online", done_at: timestamp}

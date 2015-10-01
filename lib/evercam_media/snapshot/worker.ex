@@ -73,7 +73,6 @@ defmodule EvercamMedia.Snapshot.Worker do
       poller: poller,
       event_manager: event_manager
     }
-    IO.puts inspect args
     {:ok, args}
   end
 

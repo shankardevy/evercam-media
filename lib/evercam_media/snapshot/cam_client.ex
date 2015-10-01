@@ -6,6 +6,7 @@ defmodule EvercamMedia.Snapshot.CamClient do
 
   alias EvercamMedia.HTTPClient
   alias EvercamMedia.Snapshot.Util
+  require Logger
 
   @doc """
   Connect to the camera and get the snapshot
@@ -13,6 +14,7 @@ defmodule EvercamMedia.Snapshot.CamClient do
   def fetch_snapshot(args) do
     [username, password] = String.split(args[:auth], ":")
     try do
+      Logger.debug "Fetching snapshot for camera #{inspect args[:camera_exid]} - #{inspect args}"
       response =
         case args[:vendor_exid] do
           "samsung" -> HTTPClient.get(:digest_auth, args[:url], username, password)
