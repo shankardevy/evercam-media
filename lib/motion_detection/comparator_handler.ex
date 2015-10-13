@@ -40,13 +40,9 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
   end
 
   def update_snapshot_status(camera_exid, timestamp, motion_level) do
-    # camera = Repo.one! Camera.by_exid(camera_exid)
-    # Logger.info "update_snapshot_status camera=#{camera}"
+    camera = Repo.one! Camera.by_exid(camera_exid)
 
-    # snapshot = Repo.get_by!(Snapshot, camera_id: camera_exid, created_at: timestamp)
-    # Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
-
-    snapshot = Repo.one! Snapshot.for_camera(camera_exid)
+    snapshot = Repo.one! Snapshot.for_camera(camera.id,timestamp)
     Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
 
     # camera = %{camera | MotionLevel: S3.file_url(file_path)}

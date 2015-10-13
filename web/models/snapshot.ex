@@ -2,7 +2,7 @@ defmodule Snapshot do
   use Ecto.Model
 
   schema "snapshots" do
-    belongs_to :camera, Camera, foreign_key_type: :string
+    belongs_to :camera, Camera
 
     field :data, :string
     field :notes, :string
