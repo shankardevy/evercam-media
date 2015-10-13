@@ -1,5 +1,6 @@
 defmodule EvercamMedia.Snapshot.CacheHandler do
   use GenEvent
+  require Logger
 
   @moduledoc """
   TODO
