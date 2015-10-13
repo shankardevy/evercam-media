@@ -39,8 +39,9 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
     {:ok, state}
   end
 
-  def update_snapshot_status(camera_exid, timestamp, motion_level) do
+  def update_snapshot_status(camera_exid, seconds, motion_level) do
     camera = Repo.one! Camera.by_exid(camera_exid)
+    {_,timestamp} = Timex.Date.from(seconds, :secs) |> Timex.Ecto.DateTime.cast
 
     snapshot = Repo.one! Snapshot.for_camera(camera.id,timestamp)
     Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
