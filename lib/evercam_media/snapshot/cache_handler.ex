@@ -44,7 +44,6 @@ defmodule EvercamMedia.Snapshot.CacheHandler do
 
     last = ConCache.get(:cache, camera_exid_last)
     previous = ConCache.get(:cache, camera_exid_previous)
-    Logger.info "last = #{last[:timestamp]}, previous = #{previous[:timestamp]}"
 
     {:ok, state}
   end

@@ -117,4 +117,4 @@ static ErlNifFunc nif_funcs[] =
 	{"_compare", 6, _compare},
 };
 
-ERL_NIF_INIT(Elixir.EvercamMedia.Motiondetection,nif_funcs,NULL,NULL,NULL,NULL)
+ERL_NIF_INIT(Elixir.EvercamMedia.MotionDetection.Lib,nif_funcs,NULL,NULL,NULL,NULL)
