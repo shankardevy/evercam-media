@@ -8,6 +8,7 @@ defmodule EvercamMedia.Snapshot.CacheHandler do
 
   def handle_event({:got_snapshot, data}, state) do
     {camera_exid, timestamp, image} = data
+    Logger.info "Inside handle_event #{camera_exid}"
     ConCache.put(:cache, camera_exid, %{image: image, timestamp: timestamp, notes: "Evercam Proxy"})
 
     camera_exid_last = "#{camera_exid}_last"
