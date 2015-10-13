@@ -8,8 +8,12 @@ defmodule EvercamMedia.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     compilers: [:phoenix] ++ Mix.compilers,
+     compilers: [:make, :phoenix] ++ Mix.compilers,
      deps: deps]
+  end
+
+  defp aliases do
+    [clean: ["clean", "clean.make"]]
   end
 
   def application do
@@ -64,5 +68,27 @@ defmodule EvercamMedia.Mixfile do
      {:exq, "~> 0.2.3"},
      {:uuid, github: 'zyro/elixir-uuid', override: true},
      {:exrm, "~> 0.14.16"}]
+  end
+end
+
+defmodule Mix.Tasks.Compile.Make do
+  @shortdoc "Compiles helper in c_src"
+
+  def run(_) do
+    {result, _error_code} = System.cmd("make", [], stderr_to_stdout: true)
+    Mix.shell.info result
+
+    :ok
+  end
+end
+
+defmodule Mix.Tasks.Clean.Make do
+  @shortdoc "Cleans helper in c_src"
+
+  def run(_) do
+    {result, _error_code} = System.cmd("make", ['clean'], stderr_to_stdout: true)
+    Mix.shell.info result
+
+    :ok
   end
 end
