@@ -63,6 +63,7 @@ defmodule EvercamMedia.Mixfile do
      {:dotenv, "~> 0.0.4"},
      {:poison, "~> 1.5"},
      {:timex, "~> 0.19", override: true},
+     {:timex_ecto, "~> 0.5.0"},
      {:porcelain, "~> 2.0"},
      {:erlcloud, github: 'gleber/erlcloud'},
      {:exq, "~> 0.2.3"},
