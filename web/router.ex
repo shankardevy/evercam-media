@@ -18,6 +18,8 @@ defmodule EvercamMedia.Router do
 
     post "/v1/cameras/test", SnapshotController, :test
     get "/v1/cameras/:id/live/snapshot", SnapshotController, :show
+    get "/v1/cameras/:id/live/snapshot/last", SnapshotController, :show_last
+    get "/v1/cameras/:id/live/snapshot/previous", SnapshotController, :show_previous
     post "/v1/cameras/:id/recordings/snapshots", SnapshotController, :create
 
     get "/v1/cameras/:id/touch", CameraController, :update
