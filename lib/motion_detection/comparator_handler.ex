@@ -1,6 +1,8 @@
 defmodule EvercamMedia.MotionDetection.ComparatorHandler do
   use GenEvent
   require Logger
+  alias EvercamMedia.Repo
+  import Ecto.Query
 
   @moduledoc """
   TODO
@@ -30,9 +32,28 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
       EvercamMedia.MotionDetection.Lib.init
       motion_level = EvercamMedia.MotionDetection.Lib.compare(last_image,previous_image)
       Logger.info "motion_level = #{motion_level}"
+
+      update_snapshot_status("#{camera_exid}", previous[:timestamp], motion_level)
     end
 
     {:ok, state}
+  end
+
+  def update_snapshot_status(camera_exid, timestamp, motion_level) do
+    # camera = Repo.one! Camera.by_exid(camera_exid)
+    # Logger.info "update_snapshot_status camera=#{camera}"
+
+    # snapshot = Repo.get_by!(Snapshot, camera_id: camera_exid, created_at: timestamp)
+    # Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
+
+    snapshot = Repo.one! Snapshot.for_camera(camera_exid)
+    Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
+
+    # camera = %{camera | MotionLevel: S3.file_url(file_path)}
+    #
+    # Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: timestamp}
+    #
+    # Repo.update camera
   end
 
   def handle_event(_, state) do
