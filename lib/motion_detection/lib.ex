@@ -1,4 +1,4 @@
-defmodule EvercamMedia.Motiondetection do
+defmodule EvercamMedia.MotionDetection.Lib do
   @on_load :init
 
   def init() do
