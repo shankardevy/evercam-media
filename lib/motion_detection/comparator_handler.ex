@@ -33,7 +33,7 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
       motion_level = EvercamMedia.MotionDetection.Lib.compare(last_image,previous_image)
       Logger.info "motion_level = #{motion_level}"
 
-      update_snapshot_status("#{camera_exid}", previous[:timestamp], motion_level)
+      update_snapshot_status("#{camera_exid}", last[:timestamp], motion_level)
     end
 
     {:ok, state}
@@ -52,8 +52,17 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
     sec = tt.second
     usec = tt.ms
 
-    data = Ecto.DateTime.cast({{year, month, day}, {hour, min, sec, usec}})
-    {:ok,timestamp} = data
+    date = {year, month, day}
+    time = {hour, min, sec, usec}
+    datetime = {date, time}
+
+    date_str = date |> :erlang.tuple_to_list |> Enum.join
+    time_str = time |> :erlang.tuple_to_list |> Enum.join
+
+    Logger.info "date is #{date_str} and time is #{time_str}"
+
+    data = Ecto.DateTime.cast(datetime)
+    {_,timestamp} = data
 
     snapshot = Repo.one! Snapshot.for_camera(camera.id,timestamp)
     Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"

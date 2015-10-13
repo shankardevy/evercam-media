@@ -9,11 +9,8 @@ defmodule EvercamMedia.MotionDetection.Lib do
   end
 
   def compare(image1,image2) do
-    Logger.info "EvercamMedia.MotionDetection.Lib: Doing compare method call"
     {:ok,{width1,height1,bytes1}} = load image1
-    Logger.info "Comparison width1 is #{width1}"
     {:ok,{_width2,_height2,bytes2}} = load image2
-    Logger.info "Comparison _width2 is #{_width2}"
 
     # use this to parallel the process, and play with the quality and performance
     position    = width1*height1*3 # end position for a process
