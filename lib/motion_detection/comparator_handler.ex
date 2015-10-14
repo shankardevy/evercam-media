@@ -33,7 +33,7 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
       motion_level = EvercamMedia.MotionDetection.Lib.compare(last_image,previous_image)
       Logger.info "motion_level = #{motion_level}"
 
-      update_snapshot_status("#{camera_exid}", last[:timestamp], motion_level)
+      update_snapshot_status("#{camera_exid}", previous[:timestamp], motion_level)
     end
 
     {:ok, state}
