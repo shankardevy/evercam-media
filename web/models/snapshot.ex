@@ -17,10 +17,6 @@ defmodule Snapshot do
   end
 
   def for_camera(camera_id,timestamp) do
-    # passing this
-    # ^%{__struct__: Ecto.DateTime, day: 13, hour: 23, min: 5, month: 10, sec: 47, usec: 0, year: 2015},
-    # but should be this
-    # Ecto.DateTime<2015-10-13T12:15:44Z>
     from snap in Snapshot,
     where: snap.camera_id == ^camera_id and snap.created_at == ^timestamp,
     select: snap,

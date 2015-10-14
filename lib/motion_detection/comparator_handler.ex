@@ -64,14 +64,17 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
     data = Ecto.DateTime.cast(datetime)
     {_,timestamp} = data
 
-    snapshot = Repo.one! Snapshot.for_camera(camera.id,timestamp)
-    Logger.info "update_snapshot_status snapshot=#{snapshot[:created_at]}"
+    snapshot = Repo.one Snapshot.for_camera(camera.id,timestamp)
+    # snapshot = Repo.one! Snapshot.for_camera(camera.id,timestamp)
+    # Logger.info "update_snapshot_status snapshot.id=#{snapshot[:id]}"
 
-    # camera = %{camera | MotionLevel: S3.file_url(file_path)}
-    #
-    # Repo.insert %Snapshot{camera_id: camera.id, data: "S3", notes: "Evercam Proxy", created_at: timestamp}
-    #
-    # Repo.update camera
+    case snapshot do
+      nil -> Logger.info "Not snapshot for #{date_str} and #{time_str}"
+      _ ->
+        snapshot = %{snapshot | motionlevel: motion_level}
+        Logger.info "Updating the snapshot #{snapshot.id}"
+        Repo.update snapshot
+    end
   end
 
   def handle_event(_, state) do
