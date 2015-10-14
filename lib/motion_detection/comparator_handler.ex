@@ -69,7 +69,7 @@ defmodule EvercamMedia.MotionDetection.ComparatorHandler do
     # Logger.info "update_snapshot_status snapshot.id=#{snapshot[:id]}"
 
     case snapshot do
-      nil -> Logger.info "Not snapshot for #{date_str} and #{time_str}"
+      nil -> Logger.info "No snapshot for #{date_str} and #{time_str}"
       _ ->
         snapshot = %{snapshot | motionlevel: motion_level}
         Logger.info "Updating the snapshot #{snapshot.id}"
