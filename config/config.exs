@@ -7,6 +7,7 @@ use Mix.Config
 
 # Configures the endpoint
 config :evercam_media, EvercamMedia.Endpoint,
+  check_origin: false,
   url: [host: "localhost"],
   secret_key_base: "joIg696gDBw3ZjdFTkuWNz7s21nXrcRUkZn3Lsdp7pCNodzCMl/KymikuJVw0igG",
   debug_errors: false,
